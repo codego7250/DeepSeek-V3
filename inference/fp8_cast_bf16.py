@@ -38,9 +38,7 @@ def main(fp8_path, bf16_path):
         
         new_state_dict = {}
         for weight_name, weight in current_state_dict.items():
-            if weight_name.endswith("_scale_inv"):
-                continue
-            elif weight.element_size() == 1:  # FP8 weight
+            if weight.element_size() == 1:  # FP8 weight
                 scale_inv_name = f"{weight_name}_scale_inv"
                 try:
                     # Get scale_inv from the correct file
@@ -64,10 +62,6 @@ def main(fp8_path, bf16_path):
     
     # Update model index
     new_model_index_file = os.path.join(bf16_path, "model.safetensors.index.json")
-    for weight_name in fp8_weight_names:
-        scale_inv_name = f"{weight_name}_scale_inv"
-        if scale_inv_name in weight_map:
-            weight_map.pop(scale_inv_name)
     with open(new_model_index_file, "w") as f:
         json.dump({"metadata": {}, "weight_map": weight_map}, f, indent=2)
         
